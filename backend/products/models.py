@@ -1,11 +1,9 @@
 from django.db import models
+from workers.models import Contractors, SalaryWorkers
 import ast
 
 
 class ListField(models.TextField):
-    """
-    Custom field to store a Python list as a comma-separated string.
-    """
     def to_python(self, value):
         if not value:
             return []
