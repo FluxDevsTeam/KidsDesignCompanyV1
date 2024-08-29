@@ -17,22 +17,24 @@ class ListField(models.TextField):
         return ",".join(str(item) for item in value)
 
 
-class Product(models.Model):
+class Quotation(models.Model):
     name = models.CharField(max_length=100)
-    raw_materials = models.TextField()
-    quotation = models.DecimalField(max_digits=10, decimal_places=2)
-    dimensions = models.CharField(max_length=50)
-    colour = models.CharField(max_length=50)
-    design = models.TextField()
-    artisan_id = models.PositiveIntegerField()
-    artisan_cost = models.DecimalField(max_digits=10, decimal_places=2)
-    selling_price = models.DecimalField(max_digits=10, decimal_places=2)
-    cost_price = models.DecimalField(max_digits=10, decimal_places=2)
+    quotation = ListField()
 
-    def total_production_cost(self):
-        return self.cost_price + self.artisan_cost
+    def __str__(self):
+        return self.name
 
-    images = models.ImageField(blank=True, null=True)
+
+class RawMaterialUsed(models.Model):
+    name = models.CharField(max_length=100)
+    unit = models.CharField(max_length=20)
+    quantity = models.DecimalField(max_digits=10, decimal_places=2)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def cost_per_unit(self):
+        return self.price / self.quantity
+
+    category = models.CharField(max_length=50)
 
     def __str__(self):
         return self.name
@@ -41,22 +43,29 @@ class Product(models.Model):
         ordering = ["name"]
 
 
-class Quotation(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quotation = ListField()
-
-
-class RawMaterialUsed(models.Model):
+class Product(models.Model):
     name = models.CharField(max_length=100)
-    unit = models.CharField(max_length=20)  # e.g., "kg," "meters," etc.
-    quantity = models.DecimalField(max_digits=10, decimal_places=2)
-    cost_per_unit = models.DecimalField(max_digits=10, decimal_places=2)
-    category = models.CharField(max_length=50)
-    description = models.TextField(blank=True, null=True)
-    image = models.ImageField(upload_to="raw_materials/", blank=True, null=True)
+    quantity = models.PositiveIntegerField(max_length=10)
+    raw_materials = models.ForeignKey(RawMaterialUsed, on_delete=models.PROTECT)
+    images = models.ImageField(upload_to="product/", blank=True, null=True)
+    quotation = models.ForeignKey(Quotation, on_delete=models.PROTECT)
+    dimensions = models.CharField(max_length=50)
+    colour = models.CharField(max_length=50)
+    design = models.TextField()
+    contractor = models.ForeignKey(Contractors, on_delete=models.PROTECT)
+    contractor_cost = models.DecimalField(max_digits=10, decimal_places=2)
+    salary_worker = models.ForeignKey(Contractors, on_delete=models.PROTECT)
+    salary_worker_cost = models.DecimalField(max_digits=10, decimal_places=2)
 
-    def total_price(self):
-        return self.cost_per_unit / self.quantity
+    selling_price = models.DecimalField(max_digits=10, decimal_places=2)
+    cost_price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def total_production_cost(self):
+        return self.cost_price + self.contractor_cost
+
+    @property
+    def profit(self):
+        return (self.selling_price - self.cost_price) * self.quantity
 
     def __str__(self):
         return self.name

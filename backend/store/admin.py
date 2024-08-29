@@ -1,7 +1,6 @@
-# from django.contrib import admin
-# from .models import Cities,Route,Pending,Booking
-# # Register your models here.
-# admin.site.register(Cities)
-# admin.site.register(Route)
-# admin.site.register(Pending)
-# admin.site.register(Booking)
+from django.contrib import admin
+from .models import RawMaterial, Removed
+# Register your models here.
+admin.site.register(RawMaterial)
+admin.site.register(Removed)
+
