@@ -1,8 +1,8 @@
-# from rest_framework.fields import SerializerMethodField
-#
-# from flightapp.models import Route, Cities, Pending, Booking
-# from rest_framework import serializers
-#
+from rest_framework.fields import SerializerMethodField
+
+from shop.models import InventoryItem, Sold
+from rest_framework import serializers
+
 #
 # class CitiesSerializer(serializers.ModelSerializer):
 #     class Meta:
